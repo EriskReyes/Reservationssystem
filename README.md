@@ -462,7 +462,8 @@ Dieses Projekt wurde für Bildungszwecke (Modul 223) erstellt.
 
 - Entwickelt für Modul 223
 - Spring Boot 3.2.0
-- Stand: 2024
+- Stand: 2025
+- eriskreyes/denisperdomo
 
 ---
 
