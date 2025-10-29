@@ -1,0 +1,117 @@
+@startuml ERD_Terminkalender
+
+title Entity-Relationship-Diagramm (ERD) - Terminkalender Datenbank
+skinparam backgroundColor #FEFEFE
+skinparam class {
+  BackgroundColor<<entity>> LightSkyBlue
+  BorderColor<<entity>> DarkBlue
+  ArrowColor DarkBlue
+}
+
+!define table(x) class x << (T,#FFAAAA) >>
+!define primary_key(x) <b><u>x</u></b>
+!define foreign_key(x) <i>x</i>
+!define not_null(x) <b>x</b>
+
+hide methods
+hide stereotypes
+
+entity "reservationen" as reservationen <<entity>> {
+  primary_key(id) : BIGSERIAL
+  --
+  not_null(datum) : DATE
+  not_null(von_zeit) : TIME
+  not_null(bis_zeit) : TIME
+  not_null(zimmer) : INTEGER
+  not_null(bemerkung) : VARCHAR(200)
+  not_null(private_schluessel) : VARCHAR(36) [UNIQUE]
+  not_null(public_schluessel) : VARCHAR(36) [UNIQUE]
+  not_null(erstellt_am) : TIMESTAMP
+  not_null(aktualisiert_am) : TIMESTAMP
+  --
+  **Constraints:**
+  CHECK (zimmer >= 101 AND zimmer <= 105)
+}
+
+entity "teilnehmer" as teilnehmer <<entity>> {
+  primary_key(id) : BIGSERIAL
+  --
+  not_null(vorname) : VARCHAR(50)
+  not_null(nachname) : VARCHAR(50)
+  foreign_key(reservation_id) : BIGINT [FK]
+}
+
+reservationen "1" -- "0..*" teilnehmer : hat >
+note on link
+  **Beziehung:**
+  Eine Reservation kann
+  mehrere Teilnehmer haben
+  (One-to-Many)
+
+  **Cascade:**
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
+end note
+
+note right of reservationen
+  **Haupttabelle: Reservationen**
+
+  **Primärschlüssel:**
+  - id (automatisch generiert)
+
+  **Eindeutige Felder:**
+  - private_schluessel (UUID)
+    → Für Bearbeitung/Löschung
+  - public_schluessel (UUID)
+    → Für öffentliche Ansicht
+
+  **Zeitfelder:**
+  - datum (muss Zukunft sein)
+  - von_zeit, bis_zeit
+  - erstellt_am, aktualisiert_am
+    (automatisch)
+
+  **Validierung:**
+  - Zimmer: 101-105
+  - Bemerkung: 10-200 Zeichen
+  - Von-Zeit < Bis-Zeit
+  - Mindestens 15 Min. Dauer
+end note
+
+note left of teilnehmer
+  **Sekundärtabelle: Teilnehmer**
+
+  **Primärschlüssel:**
+  - id (automatisch generiert)
+
+  **Fremdschlüssel:**
+  - reservation_id
+    → Referenz zu reservationen(id)
+
+  **Validierung:**
+  - Vorname, Nachname:
+    Nur Buchstaben erlaubt
+    [A-Za-zÄäÖöÜüß]
+
+  **Format bei Eingabe:**
+  "Vorname Nachname, Vorname Nachname"
+  (Komma-getrennt)
+end note
+
+note bottom of reservationen
+  **Indizes für Performance:**
+  - idx_reservationen_datum
+  - idx_reservationen_zimmer
+  - idx_reservationen_zimmer_datum
+  - idx_reservationen_private_key
+  - idx_reservationen_public_key
+  - idx_reservationen_erstellt_am
+end note
+
+note bottom of teilnehmer
+  **Index:**
+  - idx_teilnehmer_reservation
+    (auf reservation_id)
+end note
+
+@enduml

@@ -1,0 +1,276 @@
+@startuml Klassendiagramm_Terminkalender
+
+title UML-Klassendiagramm - Terminkalender System
+skinparam backgroundColor #FEFEFE
+skinparam class {
+  BackgroundColor<<Controller>> LightGreen
+  BackgroundColor<<Service>> LightBlue
+  BackgroundColor<<Repository>> LightYellow
+  BackgroundColor<<Model>> LightCoral
+  BackgroundColor<<DTO>> Wheat
+  ArrowColor DarkBlue
+}
+
+' ==================== CONTROLLERS ====================
+
+class IndexController <<Controller>> {
+  - reservationService : ReservationService
+  --
+  + zeigHauptseite(model: Model) : String
+  + sucheNachSchluessel(schluessel: String, redirectAttributes: RedirectAttributes) : String
+}
+
+class ReservationController <<Controller>> {
+  - reservationService : ReservationService
+  - validationService : ValidationService
+  --
+  + zeigeFormular(model: Model) : String
+  + erstelleReservation(dto: ReservationDTO, result: BindingResult, model: Model) : String
+  + zeigeBestaetigung(id: Long, model: Model) : String
+  + zeigeOeffentlicheAnsicht(publicSchluessel: String, model: Model) : String
+  + zeigeBearbeitungsansicht(privateSchluessel: String, model: Model) : String
+  + aktualisiereReservation(privateSchluessel: String, dto: ReservationDTO, result: BindingResult) : String
+  + loescheReservation(privateSchluessel: String, redirectAttributes: RedirectAttributes) : String
+}
+
+' ==================== SERVICES ====================
+
+class ReservationService <<Service>> {
+  - reservationRepository : ReservationRepository
+  - teilnehmerRepository : TeilnehmerRepository
+  - validationService : ValidationService
+  --
+  + init() : void
+  + erstelleReservation(dto: ReservationDTO) : Reservation
+  + aktualisiereReservation(id: Long, dto: ReservationDTO) : Reservation
+  + loescheReservation(id: Long) : void
+  + findeNachPrivateSchluessel(schluessel: String) : Optional<Reservation>
+  + findeNachPublicSchluessel(schluessel: String) : Optional<Reservation>
+  + findeNachId(id: Long) : Optional<Reservation>
+  + findeAlle() : List<Reservation>
+  + findeZukuenftigeReservationen() : List<Reservation>
+  + istZimmerVerfuegbar(zimmer: Integer, datum: LocalDate, von: LocalTime, bis: LocalTime, id: Long) : boolean
+  + generierePrivateSchluessel() : String
+  + generierePublicSchluessel() : String
+  - erstelleTestDaten() : void
+}
+
+class ValidationService <<Service>> {
+  - NAME_PATTERN : Pattern {static}
+  - MIN_BEMERKUNG_LAENGE : int {static}
+  - MAX_BEMERKUNG_LAENGE : int {static}
+  - MIN_ZIMMER : int {static}
+  - MAX_ZIMMER : int {static}
+  --
+  + validiereTeilnehmer(teilnehmerString: String) : List<String[]>
+  + istDatumGueltig(datum: LocalDate) : boolean
+  + istZimmerGueltig(zimmer: Integer) : boolean
+  + istBemerkungGueltig(bemerkung: String) : boolean
+  + istZeitSinnvoll(von: LocalTime, bis: LocalTime) : boolean
+  + getZeitValidierungsFehler(von: LocalTime, bis: LocalTime) : String
+  + getVerfuegbareZimmer() : List<Integer>
+}
+
+' ==================== REPOSITORIES ====================
+
+interface ReservationRepository <<Repository>> {
+  + findByPrivateSchluessel(schluessel: String) : Optional<Reservation>
+  + findByPublicSchluessel(schluessel: String) : Optional<Reservation>
+  + findAllFutureReservations() : List<Reservation>
+  + findOverlappingReservations(zimmer: Integer, datum: LocalDate, von: LocalTime, bis: LocalTime) : List<Reservation>
+  + findOverlappingReservationsExcludingId(zimmer: Integer, datum: LocalDate, von: LocalTime, bis: LocalTime, id: Long) : List<Reservation>
+}
+
+interface TeilnehmerRepository <<Repository>> {
+  {abstract}
+}
+
+' ==================== MODELS ====================
+
+class Reservation <<Model>> {
+  - id : Long
+  - datum : LocalDate
+  - vonZeit : LocalTime
+  - bisZeit : LocalTime
+  - zimmer : Integer
+  - bemerkung : String
+  - privateSchluessel : String
+  - publicSchluessel : String
+  - teilnehmer : List<Teilnehmer>
+  - erstelltAm : LocalDateTime
+  - aktualisiertAm : LocalDateTime
+  --
+  + Reservation()
+  + Reservation(datum, vonZeit, bisZeit, zimmer, bemerkung)
+  + getId() : Long
+  + getDatum() : LocalDate
+  + getVonZeit() : LocalTime
+  + getBisZeit() : LocalTime
+  + getZimmer() : Integer
+  + getBemerkung() : String
+  + getPrivateSchluessel() : String
+  + getPublicSchluessel() : String
+  + getTeilnehmer() : List<Teilnehmer>
+  + addTeilnehmer(teilnehmer: Teilnehmer) : void
+  + removeTeilnehmer(teilnehmer: Teilnehmer) : void
+  + clearTeilnehmer() : void
+  + equals(o: Object) : boolean
+  + hashCode() : int
+  + toString() : String
+}
+
+class Teilnehmer <<Model>> {
+  - id : Long
+  - vorname : String
+  - nachname : String
+  - reservation : Reservation
+  --
+  + Teilnehmer()
+  + Teilnehmer(vorname: String, nachname: String)
+  + Teilnehmer(vorname: String, nachname: String, reservation: Reservation)
+  + getId() : Long
+  + getVorname() : String
+  + getNachname() : String
+  + getReservation() : Reservation
+  + setReservation(reservation: Reservation) : void
+  + getVollstaendigerName() : String
+  + equals(o: Object) : boolean
+  + hashCode() : int
+  + toString() : String
+}
+
+' ==================== DTO ====================
+
+class ReservationDTO <<DTO>> {
+  - datum : LocalDate
+  - vonZeit : LocalTime
+  - bisZeit : LocalTime
+  - zimmer : Integer
+  - bemerkung : String
+  - teilnehmerListe : String
+  --
+  + getDatum() : LocalDate
+  + setDatum(datum: LocalDate) : void
+  + getVonZeit() : LocalTime
+  + setVonZeit(vonZeit: LocalTime) : void
+  + getBisZeit() : LocalTime
+  + setBisZeit(bisZeit: LocalTime) : void
+  + getZimmer() : Integer
+  + setZimmer(zimmer: Integer) : void
+  + getBemerkung() : String
+  + setBemerkung(bemerkung: String) : void
+  + getTeilnehmerListe() : String
+  + setTeilnehmerListe(teilnehmerListe: String) : void
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Controller Dependencies
+IndexController --> ReservationService : verwendet
+ReservationController --> ReservationService : verwendet
+ReservationController --> ValidationService : verwendet
+ReservationController --> ReservationDTO : verwendet
+
+' Service Dependencies
+ReservationService --> ReservationRepository : verwendet
+ReservationService --> TeilnehmerRepository : verwendet
+ReservationService --> ValidationService : verwendet
+ReservationService --> Reservation : erstellt/verwaltet
+ReservationService --> Teilnehmer : erstellt
+ReservationService --> ReservationDTO : verwendet
+
+' Repository Dependencies
+ReservationRepository ..> Reservation : verwaltet
+TeilnehmerRepository ..> Teilnehmer : verwaltet
+
+' Model Relationships
+Reservation "1" *-- "0..*" Teilnehmer : enthält >
+note on link
+  OneToMany Beziehung
+  CascadeType.ALL
+  orphanRemoval = true
+end note
+
+' Annotations
+note right of IndexController
+  **@Controller**
+  Hauptseite und
+  Schlüssel-Suche
+end note
+
+note right of ReservationController
+  **@Controller**
+  **@RequestMapping("/reservation")**
+  Alle Reservation-
+  Operationen
+end note
+
+note right of ReservationService
+  **@Service**
+  **@Transactional**
+  Geschäftslogik und
+  Test-Daten Initialisierung
+end note
+
+note right of ValidationService
+  **@Service**
+  Validierungslogik für
+  Formularfelder
+end note
+
+note bottom of ReservationRepository
+  **@Repository**
+  extends JpaRepository
+  Custom Query Methods
+end note
+
+note bottom of TeilnehmerRepository
+  **@Repository**
+  extends JpaRepository
+end note
+
+note left of Reservation
+  **@Entity**
+  **@Table(name="reservationen")**
+  JPA Entity mit
+  Bean Validation
+  Annotationen
+end note
+
+note left of Teilnehmer
+  **@Entity**
+  **@Table(name="teilnehmer")**
+  JPA Entity mit
+  ManyToOne Beziehung
+end note
+
+note bottom of ReservationDTO
+  **Data Transfer Object**
+  Für Formular-Daten
+  zwischen Controller
+  und View
+end note
+
+' Layer Separation
+package "Presentation Layer" <<Rectangle>> {
+  IndexController
+  ReservationController
+}
+
+package "Business Logic Layer" <<Rectangle>> {
+  ReservationService
+  ValidationService
+}
+
+package "Data Access Layer" <<Rectangle>> {
+  ReservationRepository
+  TeilnehmerRepository
+}
+
+package "Domain Model" <<Rectangle>> {
+  Reservation
+  Teilnehmer
+  ReservationDTO
+}
+
+@enduml

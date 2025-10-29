@@ -1,0 +1,77 @@
+@startuml Zustandsdiagramm_Terminkalender
+
+title UML-Zustandsdiagramm - Terminkalender Navigationssystem
+skinparam backgroundColor #FEFEFE
+skinparam state {
+  BackgroundColor<<home>> LightBlue
+  BackgroundColor<<form>> LightGreen
+  BackgroundColor<<success>> PaleGreen
+  BackgroundColor<<view>> LightYellow
+  BackgroundColor<<edit>> LightCoral
+}
+
+[*] --> Startseite : Anwendung starten
+
+state "Startseite\n(index.html)" as Startseite <<home>>
+state "Neue Reservation\n(reservation-formular.html)" as NeueReservation <<form>>
+state "Bestätigung\n(reservation-bestaetigung.html)" as Bestaetigung <<success>>
+state "Öffentliche Ansicht\n(reservation-ansicht.html)" as OeffentlicheAnsicht <<view>>
+state "Bearbeitungsansicht\n(reservation-bearbeiten.html)" as Bearbeitungsansicht <<edit>>
+
+Startseite --> NeueReservation : Button "Jetzt reservieren"\nklicken
+NeueReservation --> Startseite : Button "Abbrechen"\nklicken
+
+NeueReservation --> NeueReservation : Validierung fehlgeschlagen\n(Fehler anzeigen)
+NeueReservation --> Bestaetigung : Formular absenden\nund validiert
+
+Bestaetigung --> Startseite : Zurück zur Startseite
+
+Startseite --> OeffentlicheAnsicht : Public Schlüssel\neingeben
+Startseite --> Bearbeitungsansicht : Private Schlüssel\neingeben
+
+Startseite --> Startseite : Ungültiger Schlüssel\n(Fehler anzeigen)
+
+OeffentlicheAnsicht --> Startseite : Zurück zur Startseite
+
+Bearbeitungsansicht --> Startseite : Reservation löschen
+Bearbeitungsansicht --> Bearbeitungsansicht : Reservation aktualisieren\n(Änderungen speichern)
+Bearbeitungsansicht --> Bearbeitungsansicht : Validierung fehlgeschlagen\n(Fehler anzeigen)
+Bearbeitungsansicht --> Startseite : Zurück zur Startseite
+
+note right of Startseite
+  **Hauptseite**
+  - Neue Reservation erstellen
+  - Reservation mit Schlüssel suchen
+  - Verfügbare Zimmer anzeigen
+end note
+
+note right of NeueReservation
+  **Formular Felder:**
+  - Datum (Zukunft)
+  - Von-Zeit, Bis-Zeit
+  - Zimmer (101-105)
+  - Bemerkung (10-200 Zeichen)
+  - Teilnehmer (Komma-getrennt)
+end note
+
+note right of Bestaetigung
+  **Zeigt an:**
+  - Private Schlüssel (bearbeiten)
+  - Public Schlüssel (ansehen)
+  - Reservationsdetails
+end note
+
+note right of OeffentlicheAnsicht
+  **Nur-Lese-Ansicht**
+  - Alle Reservationsdetails
+  - Keine Bearbeitungsmöglichkeit
+end note
+
+note right of Bearbeitungsansicht
+  **Vollzugriff mit:**
+  - Reservation bearbeiten
+  - Reservation löschen
+  - Alle Felder änderbar
+end note
+
+@enduml

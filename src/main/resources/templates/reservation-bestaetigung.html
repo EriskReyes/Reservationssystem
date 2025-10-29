@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation bestätigt</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, rgba(15, 32, 39, 0.95) 0%, rgba(32, 58, 67, 0.95) 50%, rgba(44, 83, 100, 0.95) 100%),
+                        url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000') center/cover fixed;
+            min-height: 100vh;
+            padding-top: 80px;
+            padding-bottom: 2rem;
+            color: #2c3e50;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-menu li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .navbar-menu li a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .navbar-menu li a.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.5rem;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .navbar-menu.active {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+
+            .navbar-menu li a {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Success Header */
+        .success-header {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            animation: scaleIn 0.6s ease-out;
+            box-shadow: 0 8px 24px rgba(52, 152, 219, 0.3);
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-header h1 {
+            color: #2c3e50;
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        /* Card Styles */
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .info-card h2 {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .info-card h2 .icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+
+        .detail-item strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .detail-item span, .detail-item p {
+            color: #2c3e50;
+            font-size: 1.05rem;
+            margin: 0;
+        }
+
+        .teilnehmer-liste {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .teilnehmer-liste li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #2c3e50;
+        }
+
+        .teilnehmer-liste li:before {
+            content: "\F4DA";
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            left: 0;
+            color: #3498db;
+        }
+
+        /* Warning Card */
+        .warning-card {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .warning-card h2 {
+            color: white;
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .warning-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Key Box */
+        .key-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .key-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .key-box h3 {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .key-display {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .key-display code {
+            flex: 1;
+            color: #2c3e50;
+            font-weight: 600;
+            word-break: break-all;
+            font-size: 0.95rem;
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-copy.copied {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        .key-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Buttons */
+        .btn-gradient {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            border: none;
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .btn-outline {
+            border: 2px solid #3498db;
+            color: #3498db;
+            background: white;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .footer p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .success-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+
+            .success-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .info-card, .warning-card {
+                padding: 1.5rem;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-gradient, .btn-outline {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">
+                <div class="navbar-logo">
+                    <i class="bi bi-building"></i>
+                </div>
+                <h2>Terminkalender</h2>
+            </a>
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                <i class="bi bi-list"></i>
+            </button>
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="/"><i class="bi bi-house-fill"></i> Inicio</a></li>
+                <li><a href="/reservation/neu"><i class="bi bi-calendar-plus"></i> Nueva Reservación</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Success Header -->
+        <div class="success-header" data-aos="fade-down">
+            <div class="success-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h1>Reservation erfolgreich erstellt!</h1>
+            <p class="subtitle">Ihre Raumreservation wurde erfolgreich gespeichert und ist nun aktiv</p>
+        </div>
+
+        <!-- Reservationsdetails -->
+        <div class="info-card" data-aos="fade-up">
+            <h2>
+                <span class="icon"><i class="bi bi-info-circle"></i></span>
+                Ihre Reservationsdetails
+            </h2>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <strong><i class="bi bi-calendar3 me-2"></i>Datum</strong>
+                    <span th:text="${#temporals.format(reservation.datum, 'dd.MM.yyyy')}"></span>
+                </div>
+                <div class="detail-item">
+                    <strong><i class="bi bi-clock me-2"></i>Zeitraum</strong>
+                    <span th:text="${#temporals.format(reservation.vonZeit, 'HH:mm')} + ' - ' + ${#temporals.format(reservation.bisZeit, 'HH:mm')} + ' Uhr'"></span>
+                </div>
+                <div class="detail-item">
+                    <strong><i class="bi bi-door-open me-2"></i>Zimmer</strong>
+                    <span th:text="${reservation.zimmer}"></span>
+                </div>
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                    <strong><i class="bi bi-file-text me-2"></i>Bemerkung</strong>
+                    <p th:text="${reservation.bemerkung}"></p>
+                </div>
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                    <strong><i class="bi bi-people me-2"></i>Teilnehmer</strong>
+                    <ul class="teilnehmer-liste">
+                        <li th:each="teilnehmer : ${reservation.teilnehmer}"
+                            th:text="${teilnehmer.vorname + ' ' + teilnehmer.nachname}"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schlüssel Card -->
+        <div class="warning-card" data-aos="fade-up" data-aos-delay="100">
+            <h2>
+                <i class="bi bi-shield-exclamation"></i>
+                Wichtig - Bewahren Sie diese Schlüssel auf!
+            </h2>
+            <p class="warning-text">
+                Sie benötigen diese Schlüssel, um später auf Ihre Reservation zuzugreifen.
+                <strong>Speichern Sie sie an einem sicheren Ort!</strong> Ohne diese Schlüssel können Sie Ihre Reservation nicht mehr aufrufen.
+            </p>
+
+            <div class="key-box">
+                <h3>
+                    <i class="bi bi-key-fill"></i>
+                    Private Schlüssel (zum Bearbeiten/Löschen)
+                </h3>
+                <div class="key-display">
+                    <code th:text="${reservation.privateSchluessel}"></code>
+                    <button class="btn-copy" onclick="copyToClipboard(this)" title="In Zwischenablage kopieren">
+                        <i class="bi bi-clipboard"></i> Kopieren
+                    </button>
+                </div>
+                <p class="key-description">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    Mit diesem Schlüssel können Sie die Reservation ändern oder löschen.
+                    <strong>Teilen Sie diesen Schlüssel nicht mit anderen!</strong>
+                </p>
+            </div>
+
+            <div class="key-box">
+                <h3>
+                    <i class="bi bi-eye-fill"></i>
+                    Public Schlüssel (zum Teilen)
+                </h3>
+                <div class="key-display">
+                    <code th:text="${reservation.publicSchluessel}"></code>
+                    <button class="btn-copy" onclick="copyToClipboard(this)" title="In Zwischenablage kopieren">
+                        <i class="bi bi-clipboard"></i> Kopieren
+                    </button>
+                </div>
+                <p class="key-description">
+                    <i class="bi bi-share me-1"></i>
+                    Teilen Sie diesen Schlüssel mit den Teilnehmern zur Einsicht der Reservation.
+                    Mit diesem Schlüssel kann die Reservation nur angesehen, aber nicht geändert werden.
+                </p>
+            </div>
+        </div>
+
+        <!-- Aktionen -->
+        <div class="info-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="form-actions">
+                <a th:href="@{/}" class="btn btn-gradient">
+                    <i class="bi bi-house me-2"></i>Zurück zur Hauptseite
+                </a>
+                <a th:href="@{/reservation/neu}" class="btn btn-outline">
+                    <i class="bi bi-plus-circle me-2"></i>Weitere Reservation erstellen
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer" data-aos="fade-up">
+            <p>
+                <i class="bi bi-c-circle me-1"></i> 2024 Terminkalender - Raumreservationssystem | Modul 223
+            </p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        function copyToClipboard(button) {
+            const code = button.closest('.key-display').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check-lg"></i> Kopiert!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('copied');
+                }, 2500);
+            }).catch(err => {
+                alert('Fehler beim Kopieren: ' + err);
+            });
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
