@@ -1,4 +1,5 @@
 @startuml Klassendiagramm_Terminkalender
+!pragma charset UTF-8
 
 title UML-Klassendiagramm - Terminkalender System
 skinparam backgroundColor #FEFEFE
@@ -56,11 +57,11 @@ class ReservationService <<Service>> {
 }
 
 class ValidationService <<Service>> {
-  - NAME_PATTERN : Pattern {static}
-  - MIN_BEMERKUNG_LAENGE : int {static}
-  - MAX_BEMERKUNG_LAENGE : int {static}
-  - MIN_ZIMMER : int {static}
-  - MAX_ZIMMER : int {static}
+  - {static} NAME_PATTERN : Pattern
+  - {static} MIN_BEMERKUNG_LAENGE : int
+  - {static} MAX_BEMERKUNG_LAENGE : int
+  - {static} MIN_ZIMMER : int
+  - {static} MAX_ZIMMER : int
   --
   + validiereTeilnehmer(teilnehmerString: String) : List<String[]>
   + istDatumGueltig(datum: LocalDate) : boolean
@@ -82,7 +83,6 @@ interface ReservationRepository <<Repository>> {
 }
 
 interface TeilnehmerRepository <<Repository>> {
-  {abstract}
 }
 
 ' ==================== MODELS ====================
@@ -165,112 +165,72 @@ class ReservationDTO <<DTO>> {
 
 ' ==================== RELATIONSHIPS ====================
 
-' Controller Dependencies
-IndexController --> ReservationService : verwendet
-ReservationController --> ReservationService : verwendet
-ReservationController --> ValidationService : verwendet
-ReservationController --> ReservationDTO : verwendet
+IndexController --> ReservationService
+ReservationController --> ReservationService
+ReservationController --> ValidationService
+ReservationController --> ReservationDTO
 
-' Service Dependencies
-ReservationService --> ReservationRepository : verwendet
-ReservationService --> TeilnehmerRepository : verwendet
-ReservationService --> ValidationService : verwendet
-ReservationService --> Reservation : erstellt/verwaltet
-ReservationService --> Teilnehmer : erstellt
-ReservationService --> ReservationDTO : verwendet
+ReservationService --> ReservationRepository
+ReservationService --> TeilnehmerRepository
+ReservationService --> ValidationService
+ReservationService --> Reservation
+ReservationService --> Teilnehmer
+ReservationService --> ReservationDTO
 
-' Repository Dependencies
-ReservationRepository ..> Reservation : verwaltet
-TeilnehmerRepository ..> Teilnehmer : verwaltet
+ReservationRepository ..> Reservation
+TeilnehmerRepository ..> Teilnehmer
 
-' Model Relationships
-Reservation "1" *-- "0..*" Teilnehmer : enthält >
-note on link
-  OneToMany Beziehung
-  CascadeType.ALL
-  orphanRemoval = true
-end note
+Reservation "1" *-- "0..*" Teilnehmer
 
-' Annotations
+' ==================== NOTES ====================
+
 note right of IndexController
-  **@Controller**
+  @Controller
   Hauptseite und
-  Schlüssel-Suche
+  Schluessel-Suche
 end note
 
 note right of ReservationController
-  **@Controller**
-  **@RequestMapping("/reservation")**
-  Alle Reservation-
-  Operationen
+  @Controller
+  @RequestMapping
+  Reservation-Operationen
 end note
 
 note right of ReservationService
-  **@Service**
-  **@Transactional**
-  Geschäftslogik und
-  Test-Daten Initialisierung
+  @Service
+  @Transactional
+  Geschaeftslogik
 end note
 
 note right of ValidationService
-  **@Service**
-  Validierungslogik für
-  Formularfelder
+  @Service
+  Validierungslogik
 end note
 
 note bottom of ReservationRepository
-  **@Repository**
+  @Repository
   extends JpaRepository
-  Custom Query Methods
 end note
 
 note bottom of TeilnehmerRepository
-  **@Repository**
+  @Repository
   extends JpaRepository
 end note
 
 note left of Reservation
-  **@Entity**
-  **@Table(name="reservationen")**
-  JPA Entity mit
-  Bean Validation
-  Annotationen
+  @Entity
+  @Table
+  JPA Entity
 end note
 
 note left of Teilnehmer
-  **@Entity**
-  **@Table(name="teilnehmer")**
-  JPA Entity mit
-  ManyToOne Beziehung
+  @Entity
+  @Table
+  JPA Entity
 end note
 
 note bottom of ReservationDTO
-  **Data Transfer Object**
-  Für Formular-Daten
-  zwischen Controller
-  und View
+  Data Transfer Object
 end note
-
-' Layer Separation
-package "Presentation Layer" <<Rectangle>> {
-  IndexController
-  ReservationController
-}
-
-package "Business Logic Layer" <<Rectangle>> {
-  ReservationService
-  ValidationService
-}
-
-package "Data Access Layer" <<Rectangle>> {
-  ReservationRepository
-  TeilnehmerRepository
-}
-
-package "Domain Model" <<Rectangle>> {
-  Reservation
-  Teilnehmer
-  ReservationDTO
-}
 
 @enduml
