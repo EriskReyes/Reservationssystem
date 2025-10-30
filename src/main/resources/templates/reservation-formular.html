@@ -463,6 +463,29 @@
                 <span class="error" th:if="${#fields.hasErrors('zimmer')}" th:errors="*{zimmer}"></span>
             </div>
 
+            <!-- Verfügbarkeitsanzeige -->
+            <div id="verfuegbarkeitsContainer" style="display: none; margin-top: 1.5rem;">
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid #dee2e6;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <i class="bi bi-info-circle-fill" style="color: #3498db;"></i>
+                        <strong style="color: #2c3e50;">Zimmerverfügbarkeit für gewählte Zeit</strong>
+                    </div>
+                    <div id="zimmerStatus" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem;">
+                        <!-- Wird dynamisch befüllt -->
+                    </div>
+                    <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 16px; height: 16px; background: #27ae60; border-radius: 4px;"></div>
+                            <span style="color: #7f8c8d;">Verfügbar</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 16px; height: 16px; background: #e74c3c; border-radius: 4px;"></div>
+                            <span style="color: #7f8c8d;">Besetzt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Beschreibung Section -->
             <div class="section-title mt-4">
                 <i class="bi bi-file-text-fill"></i>
@@ -555,6 +578,94 @@
         bemerkungField.addEventListener('input', function() {
             charCounter.textContent = this.value.length;
         });
+    }
+
+    // Verfügbarkeitsprüfung
+    const datumField = document.getElementById('datum');
+    const vonZeitField = document.getElementById('vonZeit');
+    const bisZeitField = document.getElementById('bisZeit');
+    const verfuegbarkeitsContainer = document.getElementById('verfuegbarkeitsContainer');
+    const zimmerStatusContainer = document.getElementById('zimmerStatus');
+
+    function pruefeVerfuegbarkeit() {
+        const datum = datumField.value;
+        const vonZeit = vonZeitField.value;
+        const bisZeit = bisZeitField.value;
+
+        // Prüfen ob alle Felder ausgefüllt sind
+        if (!datum || !vonZeit || !bisZeit) {
+            verfuegbarkeitsContainer.style.display = 'none';
+            return;
+        }
+
+        // API-Aufruf
+        fetch(`/reservation/verfuegbarkeit?datum=${datum}&vonZeit=${vonZeit}&bisZeit=${bisZeit}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    zeigeVerfuegbarkeit(data.verfuegbar, data.besetzt);
+                    verfuegbarkeitsContainer.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Fehler bei der Verfügbarkeitsprüfung:', error);
+            });
+    }
+
+    function zeigeVerfuegbarkeit(verfuegbar, besetzt) {
+        zimmerStatusContainer.innerHTML = '';
+
+        // Alle Zimmer durchgehen (101-105)
+        for (let zimmer = 101; zimmer <= 105; zimmer++) {
+            const istVerfuegbar = verfuegbar.includes(zimmer);
+            const zimmerDiv = document.createElement('div');
+            zimmerDiv.style.cssText = `
+                padding: 0.75rem;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: 600;
+                background: ${istVerfuegbar ? '#27ae60' : '#e74c3c'};
+                color: white;
+                transition: transform 0.2s ease;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            `;
+            zimmerDiv.innerHTML = `
+                <div style="font-size: 1.2rem;">
+                    <i class="bi ${istVerfuegbar ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i>
+                </div>
+                <div style="font-size: 0.95rem; margin-top: 0.25rem;">Zimmer ${zimmer}</div>
+                <div style="font-size: 0.75rem; opacity: 0.9; margin-top: 0.25rem;">
+                    ${istVerfuegbar ? 'Verfügbar' : 'Besetzt'}
+                </div>
+            `;
+
+            // Hover-Effekt
+            zimmerDiv.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+            });
+            zimmerDiv.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+            });
+
+            // Wenn verfügbar, Zimmer auswählen beim Klick
+            if (istVerfuegbar) {
+                zimmerDiv.addEventListener('click', function() {
+                    document.getElementById('zimmer').value = zimmer;
+                });
+            }
+
+            zimmerStatusContainer.appendChild(zimmerDiv);
+        }
+    }
+
+    // Event Listener für Änderungen
+    if (datumField && vonZeitField && bisZeitField) {
+        datumField.addEventListener('change', pruefeVerfuegbarkeit);
+        vonZeitField.addEventListener('change', pruefeVerfuegbarkeit);
+        bisZeitField.addEventListener('change', pruefeVerfuegbarkeit);
     }
 
     // Toggle mobile menu

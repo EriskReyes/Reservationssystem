@@ -104,6 +104,11 @@ public class ReservationService {
         return repository.findAllFutureReservations();
     }
 
+    @Transactional(readOnly = true)
+    public boolean istZimmerVerfuegbar(Integer zimmer, LocalDate datum, LocalTime von, LocalTime bis) {
+        return isRoomAvailable(zimmer, datum, von, bis, null);
+    }
+
     private void validateReservation(ReservationDTO dto, Long excludeId) {
         if (!validation.istDatumGueltig(dto.getDatum())) {
             throw new IllegalArgumentException("Datum muss in der Zukunft liegen");

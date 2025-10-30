@@ -471,14 +471,14 @@
                         <i class="bi bi-calendar-plus"></i>
                         Erstellt am
                     </strong>
-                    <span th:text="${#temporals.format(reservation.erstelltAm, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
+                    <span th:text="${#temporals.format(reservation.createdAt, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
                 </div>
                 <div class="detail-item">
                     <strong>
                         <i class="bi bi-arrow-repeat"></i>
                         Zuletzt aktualisiert
                     </strong>
-                    <span th:text="${#temporals.format(reservation.aktualisiertAm, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
+                    <span th:text="${#temporals.format(reservation.updatedAt, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
                 </div>
             </div>
         </div>

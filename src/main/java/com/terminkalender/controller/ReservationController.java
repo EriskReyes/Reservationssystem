@@ -11,7 +11,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -172,5 +174,44 @@ public class ReservationController {
             attrs.addFlashAttribute("fehler", "Fehler beim Löschen der Reservation");
             return "redirect:/reservation/bearbeiten/" + privateKey;
         }
+    }
+
+    @GetMapping("/verfuegbarkeit")
+    @ResponseBody
+    public Map<String, Object> pruefeVerfuegbarkeit(
+            @RequestParam String datum,
+            @RequestParam String vonZeit,
+            @RequestParam String bisZeit) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            LocalDate date = LocalDate.parse(datum);
+            LocalTime von = LocalTime.parse(vonZeit);
+            LocalTime bis = LocalTime.parse(bisZeit);
+
+            List<Integer> alleZimmer = validation.getVerfuegbareZimmer();
+            List<Integer> verfuegbar = new ArrayList<>();
+            List<Integer> besetzt = new ArrayList<>();
+
+            for (Integer zimmer : alleZimmer) {
+                boolean istVerfuegbar = service.istZimmerVerfuegbar(zimmer, date, von, bis);
+                if (istVerfuegbar) {
+                    verfuegbar.add(zimmer);
+                } else {
+                    besetzt.add(zimmer);
+                }
+            }
+
+            result.put("success", true);
+            result.put("verfuegbar", verfuegbar);
+            result.put("besetzt", besetzt);
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("error", "Fehler bei der Verfügbarkeitsprüfung");
+        }
+
+        return result;
     }
 }

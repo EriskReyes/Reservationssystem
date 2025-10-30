@@ -534,7 +534,7 @@
 
         <!-- Formular -->
         <div class="form-card" data-aos="fade-up">
-            <form th:action="@{/reservation/aktualisieren/{schluessel}(schluessel=${reservation.privateSchluessel})}"
+            <form th:action="@{/reservation/aktualisieren/{schluessel}(schluessel=${reservation.privateKey})}"
                   th:object="${reservationDTO}"
                   method="post">
 
@@ -696,19 +696,19 @@
             <div class="details-grid">
                 <div class="detail-item">
                     <strong>Erstellt am</strong>
-                    <span th:text="${#temporals.format(reservation.erstelltAm, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
+                    <span th:text="${#temporals.format(reservation.createdAt, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
                 </div>
                 <div class="detail-item">
                     <strong>Zuletzt aktualisiert</strong>
-                    <span th:text="${#temporals.format(reservation.aktualisiertAm, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
+                    <span th:text="${#temporals.format(reservation.updatedAt, 'dd.MM.yyyy HH:mm')} + ' Uhr'"></span>
                 </div>
                 <div class="detail-item">
                     <strong>Private Schlüssel</strong>
-                    <code th:text="${reservation.privateSchluessel}"></code>
+                    <code th:text="${reservation.privateKey}"></code>
                 </div>
                 <div class="detail-item">
                     <strong>Public Schlüssel</strong>
-                    <code th:text="${reservation.publicSchluessel}"></code>
+                    <code th:text="${reservation.publicKey}"></code>
                 </div>
             </div>
         </div>
@@ -724,7 +724,7 @@
                 <strong>Achtung:</strong> Das Löschen der Reservation ist endgültig und kann nicht rückgängig gemacht werden!
                 Alle Daten werden unwiderruflich gelöscht.
             </p>
-            <form th:action="@{/reservation/loeschen/{schluessel}(schluessel=${reservation.privateSchluessel})}"
+            <form th:action="@{/reservation/loeschen/{schluessel}(schluessel=${reservation.privateKey})}"
                   method="post"
                   onsubmit="return confirm('⚠️ ACHTUNG ⚠️\n\nSind Sie absolut sicher, dass Sie diese Reservation löschen möchten?\n\nDieser Vorgang kann NICHT rückgängig gemacht werden!\n\n✓ Drücken Sie OK zum Löschen\n✗ Drücken Sie Abbrechen, um die Reservation zu behalten');">
                 <button type="submit" class="btn btn-danger">
