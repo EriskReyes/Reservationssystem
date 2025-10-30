@@ -135,3 +135,4 @@ echo.
 echo 💡 CONSEJO: Mantén esta ventana abierta para ver el estado
 echo.
 pause
+@REM
