@@ -1,0 +1,159 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║       CÓMO INICIAR EL SISTEMA DE RESERVACIONES DESDE CERO        ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════
+  MÉTODO RÁPIDO - UN SOLO PASO (RECOMENDADO)
+═══════════════════════════════════════════════════════════════════
+
+1. Haz doble click en:  INICIAR-TODO.cmd
+
+2. Sigue las instrucciones en pantalla
+
+3. Cuando termine, abre IntelliJ IDEA y ejecuta el proyecto
+
+4. Abre tu navegador en: http://localhost:8080
+
+¡Listo! ✓
+
+
+═══════════════════════════════════════════════════════════════════
+  MÉTODO MANUAL - PASO POR PASO
+═══════════════════════════════════════════════════════════════════
+
+PASO 1: Abrir Docker Desktop
+   - Busca "Docker Desktop" en el menú de inicio de Windows
+   - Ábrelo y espera que cargue (ícono verde en la barra de tareas)
+
+PASO 2: Iniciar PostgreSQL
+   - Haz doble click en: iniciar-postgres.cmd
+   - Espera el mensaje: "PostgreSQL está listo!"
+
+PASO 3: Inicializar la Base de Datos (solo la primera vez)
+   - Haz doble click en: inicializar-db.cmd
+   - Espera el mensaje: "Base de datos inicializada!"
+
+PASO 4: Iniciar Spring Boot
+
+   OPCIÓN A - Con IntelliJ IDEA:
+   1. Abre IntelliJ IDEA
+   2. Abre el proyecto
+   3. Ve a: src/main/java/com/terminkalender/TerminkalenderApplication.java
+   4. Click derecho → Run 'TerminkalenderApplication'
+   5. Espera el mensaje: "Started TerminkalenderApplication"
+
+   OPCIÓN B - Con Maven:
+   1. Abre CMD en la carpeta del proyecto
+   2. Ejecuta: mvn spring-boot:run
+   3. Espera el mensaje: "Started TerminkalenderApplication"
+
+PASO 5: Abrir la Aplicación
+   - Abre tu navegador en: http://localhost:8080
+
+
+═══════════════════════════════════════════════════════════════════
+  INFORMACIÓN DE CONEXIÓN
+═══════════════════════════════════════════════════════════════════
+
+PostgreSQL:
+   Host:     localhost
+   Puerto:   5432
+   Database: reservations_db
+   Usuario:  reservations_user
+   Password: reservations_pass
+
+Aplicación Web:
+   URL: http://localhost:8080
+
+
+═══════════════════════════════════════════════════════════════════
+  SCRIPTS DISPONIBLES
+═══════════════════════════════════════════════════════════════════
+
+INICIAR-TODO.cmd          → Hace TODO automáticamente (recomendado)
+iniciar-postgres.cmd      → Solo inicia PostgreSQL
+inicializar-db.cmd        → Solo crea las tablas (primera vez)
+detener-postgres.cmd      → Detiene PostgreSQL cuando termines
+
+
+═══════════════════════════════════════════════════════════════════
+  SOLUCIÓN DE PROBLEMAS
+═══════════════════════════════════════════════════════════════════
+
+❌ Error: "Docker Desktop no está corriendo"
+   ✓ Abre Docker Desktop desde el menú de inicio
+   ✓ Espera que el ícono esté verde en la barra de tareas
+   ✓ Vuelve a intentar
+
+❌ Error: "Connection to localhost:5432 refused"
+   ✓ Ejecuta: iniciar-postgres.cmd
+   ✓ Espera que termine
+   ✓ Vuelve a iniciar Spring Boot
+
+❌ Error: "Port 8080 already in use"
+   ✓ Cierra otras aplicaciones que usen el puerto 8080
+   ✓ O detén Spring Boot anterior en IntelliJ
+
+❌ Error: "relation does not exist"
+   ✓ Ejecuta: inicializar-db.cmd
+   ✓ Vuelve a iniciar Spring Boot
+
+
+═══════════════════════════════════════════════════════════════════
+  PROCESO COMPLETO DESDE CERO (RESUMEN)
+═══════════════════════════════════════════════════════════════════
+
+Cuando el proyecto esté cerrado y quieras iniciarlo:
+
+1. Asegúrate que Docker Desktop esté corriendo (verde en barra)
+2. Ejecuta: INICIAR-TODO.cmd
+3. Abre IntelliJ IDEA
+4. Ejecuta: TerminkalenderApplication.java
+5. Abre: http://localhost:8080
+
+¡Y listo! 🎉
+
+
+═══════════════════════════════════════════════════════════════════
+  PARA DETENER TODO
+═══════════════════════════════════════════════════════════════════
+
+1. En IntelliJ: Click en el botón rojo "Stop" ⬛
+2. Ejecuta: detener-postgres.cmd (opcional, si quieres apagar PostgreSQL)
+
+
+═══════════════════════════════════════════════════════════════════
+  NOTAS IMPORTANTES
+═══════════════════════════════════════════════════════════════════
+
+• PostgreSQL quedará corriendo en segundo plano (no necesitas
+  reiniciarlo cada vez)
+
+• Solo necesitas ejecutar "inicializar-db.cmd" la PRIMERA vez
+  o si borras los datos
+
+• El archivo "INICIAR-TODO.cmd" detecta automáticamente si
+  PostgreSQL ya está corriendo y lo inicia si es necesario
+
+• Puedes cerrar IntelliJ y las ventanas CMD después de iniciar
+  (PostgreSQL seguirá corriendo en Docker)
+
+
+═══════════════════════════════════════════════════════════════════
+  ¿NECESITAS AYUDA?
+═══════════════════════════════════════════════════════════════════
+
+Si algo no funciona:
+1. Revisa la sección "SOLUCIÓN DE PROBLEMAS" arriba
+2. Verifica que Docker Desktop esté corriendo
+3. Ejecuta INICIAR-TODO.cmd y observa los mensajes
+4. Lee los errores en la consola de IntelliJ
+
+
+═══════════════════════════════════════════════════════════════════
+
+Última actualización: 30 de Octubre 2025
+Versión: 1.0.0
