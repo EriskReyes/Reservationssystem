@@ -1,23 +1,24 @@
+```batch
 @echo off
 echo ========================================
-echo   Inicializando Base de Datos
+echo   Datenbank wird initialisiert
 echo ========================================
 echo.
 
-REM Verificar si PostgreSQL esta corriendo
+REM Prüfen ob PostgreSQL läuft
 docker ps | findstr "postgres-terminkalender" >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] PostgreSQL no esta corriendo!
+    echo [FEHLER] PostgreSQL läuft nicht!
     echo.
-    echo Por favor ejecuta primero: iniciar-postgres.cmd
+    echo Bitte zuerst ausführen: iniciar-postgres.cmd
     echo.
     pause
     exit /b 1
 )
 
-echo [OK] PostgreSQL esta corriendo
+echo [OK] PostgreSQL läuft
 echo.
-echo Inicializando tablas...
+echo Tabellen werden initialisiert...
 echo.
 
 docker exec -i postgres-terminkalender psql -U reservations_user -d reservations_db < init.sql
@@ -25,13 +26,14 @@ docker exec -i postgres-terminkalender psql -U reservations_user -d reservations
 if %errorlevel% equ 0 (
     echo.
     echo ========================================
-    echo   Base de datos inicializada!
+    echo   Datenbank erfolgreich initialisiert!
     echo ========================================
 ) else (
     echo.
-    echo [ERROR] Hubo un problema al inicializar la base de datos
-    echo Esto puede ser normal si las tablas ya existen.
+    echo [FEHLER] Problem beim Initialisieren der Datenbank
+    echo Dies kann normal sein, wenn die Tabellen bereits existieren.
 )
 
 echo.
 pause
+```

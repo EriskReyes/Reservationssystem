@@ -1,48 +1,49 @@
+```batch
 @echo off
 chcp 65001 >nul
 echo.
 echo ╔════════════════════════════════════════════════════════════╗
 echo ║                                                            ║
-echo ║         SISTEMA DE RESERVACIONES - INICIO COMPLETO         ║
+echo ║      RESERVIERUNGSSYSTEM - VOLLSTÄNDIGER START             ║
 echo ║                                                            ║
 echo ╚════════════════════════════════════════════════════════════╝
 echo.
-echo Este script hará TODO automáticamente:
-echo   ✓ Verificar Docker
-echo   ✓ Iniciar PostgreSQL
-echo   ✓ Crear tablas si no existen
-echo   ✓ Verificar conexión
+echo Dieses Skript führt ALLES automatisch aus:
+echo   ✓ Docker überprüfen
+echo   ✓ PostgreSQL starten
+echo   ✓ Tabellen erstellen falls nicht vorhanden
+echo   ✓ Verbindung überprüfen
 echo.
 pause
 echo.
 
-REM ===== PASO 1: Verificar Docker =====
+REM ===== SCHRITT 1: Docker überprüfen =====
 echo ┌────────────────────────────────────────────────────────────┐
-echo │ PASO 1/4: Verificando Docker Desktop...                   │
+echo │ SCHRITT 1/4: Docker Desktop wird überprüft...             │
 echo └────────────────────────────────────────────────────────────┘
 echo.
 
 docker info >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [✗] ERROR: Docker Desktop no está corriendo!
+    echo [✗] FEHLER: Docker Desktop läuft nicht!
     echo.
-    echo 📌 SOLUCIÓN:
-    echo    1. Busca "Docker Desktop" en el menú de inicio
-    echo    2. Ábrelo y espera que cargue completamente
-    echo    3. El ícono de Docker en la barra debe estar verde
-    echo    4. Vuelve a ejecutar este script
+    echo 📌 LÖSUNG:
+    echo    1. Suche "Docker Desktop" im Startmenü
+    echo    2. Öffne es und warte bis es vollständig geladen ist
+    echo    3. Das Docker-Symbol in der Taskleiste muss grün sein
+    echo    4. Führe dieses Skript erneut aus
     echo.
     pause
     exit /b 1
 )
 
-echo [✓] Docker Desktop está corriendo
+echo [✓] Docker Desktop läuft
 echo.
 timeout /t 2 /nobreak >nul
 
-REM ===== PASO 2: Iniciar PostgreSQL =====
+REM ===== SCHRITT 2: PostgreSQL starten =====
 echo ┌────────────────────────────────────────────────────────────┐
-echo │ PASO 2/4: Iniciando PostgreSQL...                         │
+echo │ SCHRITT 2/4: PostgreSQL wird gestartet...                 │
 echo └────────────────────────────────────────────────────────────┘
 echo.
 
@@ -50,89 +51,90 @@ docker ps -a | findstr "postgres-terminkalender" >nul 2>&1
 if %errorlevel% equ 0 (
     docker ps | findstr "postgres-terminkalender" >nul 2>&1
     if %errorlevel% equ 0 (
-        echo [✓] PostgreSQL ya está corriendo
+        echo [✓] PostgreSQL läuft bereits
     ) else (
-        echo Iniciando contenedor existente...
+        echo Vorhandener Container wird gestartet...
         docker start postgres-terminkalender >nul 2>&1
-        echo [✓] PostgreSQL iniciado
+        echo [✓] PostgreSQL gestartet
         timeout /t 3 /nobreak >nul
     )
 ) else (
-    echo Creando nuevo contenedor PostgreSQL...
+    echo Neuer PostgreSQL-Container wird erstellt...
     docker-compose up -d postgres
-    echo [✓] PostgreSQL creado
+    echo [✓] PostgreSQL erstellt
     echo.
-    echo Esperando que PostgreSQL esté listo...
+    echo Warte bis PostgreSQL bereit ist...
     timeout /t 8 /nobreak >nul
 )
 
 echo.
 
-REM ===== PASO 3: Verificar Base de Datos =====
+REM ===== SCHRITT 3: Datenbank überprüfen =====
 echo ┌────────────────────────────────────────────────────────────┐
-echo │ PASO 3/4: Verificando Base de Datos...                    │
+echo │ SCHRITT 3/4: Datenbank wird überprüft...                  │
 echo └────────────────────────────────────────────────────────────┘
 echo.
 
-REM Verificar si las tablas existen
+REM Prüfen ob Tabellen existieren
 docker exec postgres-terminkalender psql -U reservations_user -d reservations_db -c "\dt" 2>nul | findstr "reservationen" >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Las tablas no existen. Inicializando...
+    echo Tabellen existieren nicht. Initialisierung läuft...
     docker exec -i postgres-terminkalender psql -U reservations_user -d reservations_db < init.sql >nul 2>&1
     if %errorlevel% equ 0 (
-        echo [✓] Base de datos inicializada
+        echo [✓] Datenbank initialisiert
     ) else (
-        echo [!] No se pudo inicializar (puede ser que ya exista)
+        echo [!] Konnte nicht initialisiert werden (existiert möglicherweise bereits)
     )
 ) else (
-    echo [✓] Base de datos ya está inicializada
+    echo [✓] Datenbank ist bereits initialisiert
 )
 
 echo.
 timeout /t 2 /nobreak >nul
 
-REM ===== PASO 4: Verificación Final =====
+REM ===== SCHRITT 4: Abschließende Überprüfung =====
 echo ┌────────────────────────────────────────────────────────────┐
-echo │ PASO 4/4: Verificación Final...                           │
+echo │ SCHRITT 4/4: Abschließende Überprüfung...                 │
 echo └────────────────────────────────────────────────────────────┘
 echo.
 
-echo Estado del contenedor:
+echo Container-Status:
 docker ps --filter "name=postgres-terminkalender" --format "  - {{.Names}}: {{.Status}}"
 
 echo.
-echo Tablas en la base de datos:
+echo Tabellen in der Datenbank:
 docker exec postgres-terminkalender psql -U reservations_user -d reservations_db -c "\dt" 2>nul | findstr "reservationen\|teilnehmer" | findstr /v "row"
 
 echo.
 echo.
 echo ╔════════════════════════════════════════════════════════════╗
-echo ║                     ✓ TODO LISTO ✓                         ║
+echo ║                    ✓ ALLES BEREIT ✓                        ║
 echo ╚════════════════════════════════════════════════════════════╝
 echo.
-echo 📊 INFORMACIÓN DE CONEXIÓN:
+echo 📊 VERBINDUNGSINFORMATIONEN:
 echo    Host:     localhost
-echo    Puerto:   5432
-echo    Database: reservations_db
-echo    Usuario:  reservations_user
-echo    Password: reservations_pass
+echo    Port:     5432
+echo    Datenbank: reservations_db
+echo    Benutzer:  reservations_user
+echo    Passwort:  reservations_pass
 echo.
-echo 🚀 PRÓXIMOS PASOS:
+echo 🚀 NÄCHSTE SCHRITTE:
 echo.
-echo    OPCIÓN 1 - IntelliJ IDEA (Recomendado):
-echo       1. Abre IntelliJ IDEA
-echo       2. Abre el proyecto
-echo       3. Ve a: src/main/java/com/terminkalender/
-echo       4. Abre: TerminkalenderApplication.java
-echo       5. Click derecho → Run 'TerminkalenderApplication'
-echo       6. Espera y abre: http://localhost:8080
+echo    OPTION 1 - IntelliJ IDEA (Empfohlen):
+echo       1. Öffne IntelliJ IDEA
+echo       2. Öffne das Projekt
+echo       3. Gehe zu: src/main/java/com/terminkalender/
+echo       4. Öffne: TerminkalenderApplication.java
+echo       5. Rechtsklick → Run 'TerminkalenderApplication'
+echo       6. Warte und öffne: http://localhost:8080
 echo.
-echo    OPCIÓN 2 - Maven:
-echo       1. Abre CMD en esta carpeta
-echo       2. Ejecuta: mvn spring-boot:run
-echo       3. Espera y abre: http://localhost:8080
+echo    OPTION 2 - Maven:
+echo       1. Öffne CMD in diesem Ordner
+echo       2. Führe aus: mvn spring-boot:run
+echo       3. Warte und öffne: http://localhost:8080
 echo.
-echo 💡 CONSEJO: Mantén esta ventana abierta para ver el estado
+echo 💡 TIPP: Halte dieses Fenster offen um den Status zu sehen
 echo.
 pause
 @REM
+```

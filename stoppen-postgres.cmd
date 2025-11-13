@@ -1,12 +1,13 @@
 @echo off
 echo ========================================
-echo   Deteniendo PostgreSQL
+echo   PostgreSQL wird gestoppt
 echo ========================================
 echo.
 
 docker stop postgres-terminkalender
 
 echo.
-echo [OK] PostgreSQL detenido
+echo [OK] PostgreSQL gestoppt
 echo.
 pause
+```
