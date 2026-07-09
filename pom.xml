@@ -13,9 +13,9 @@
     </parent>
 
     <groupId>com.terminkalender</groupId>
-    <artifactId>Terminkalender</artifactId>
+    <artifactId>Reservationssystem</artifactId>
     <version>1.0.0</version>
-    <name>Terminkalender</name>
+    <name>Reservationssystem</name>
     <description>Raumreservationssystem für Modul 223</description>
 
     <properties>
