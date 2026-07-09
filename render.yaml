@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: reservationssystem
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DDL_AUTO
+        sync: false

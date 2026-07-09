@@ -46,3 +46,6 @@ secrets.yml
 ### Logs ###
 logs/
 *.log
+
+### Windows reserved device names ###
+nul
