@@ -465,6 +465,4 @@ Dieses Projekt wurde für Bildungszwecke (Modul 223) erstellt.
 - Stand: 2025
 - eriskreyes/denisperdomo
 
----
 
-**Viel Erfolg mit dem Terminkalender! 🎉**
